@@ -1,113 +1,182 @@
-package main;
-import admin.LoginSystem;
-import teacher.Teacher_Login;
-import java.util.concurrent.TimeUnit;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-public class RegistrationSystem {
-	
-    public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        LoginSystem l=new LoginSystem();
-        Teacher_Login t=new Teacher_Login();
-        System.out.println("==================================================================================================");
-        System.out.println("Welcome to the Hour wise lecture management System");
-        System.out.println("==================================================================================================");
+index.html
 
-        while (true) {
-        	System.out.println(".........................................\nPlease choose how do you want to proceed\n.........................................");
-            System.out.println("1. Admin\n-----------------");
-            System.out.println("2. Teacher\n-----------------");
-            System.out.println("3. Student\n-----------------");
-            System.out.println("4. Exit\n-----------------");
-            System.out.print("Please choose an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hour Wise Lecture Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Hour Wise Lecture Management System</h1>
+        <div id="menu">
+            <p>Please choose how you want to proceed:</p>
+            <button onclick="showAdminLogin()">Admin</button>
+            <button onclick="showTeacherLogin()">Teacher</button>
+            <button onclick="showStudentTimetable()">Student</button>
+            <button onclick="exitSystem()">Exit</button>
+        </div>
+        <div id="admin-login" class="hidden">
+            <!-- Admin login form can go here -->
+            <p>Admin login form...</p>
+            <button onclick="goBack()">Back</button>
+        </div>
+        <div id="teacher-login" class="hidden">
+            <!-- Teacher login form can go here -->
+            <p>Teacher login form...</p>
+            <button onclick="goBack()">Back</button>
+        </div>
+        <div id="student-timetable" class="hidden">
+            <label for="semester">Enter your Semester:</label>
+            <input type="text" id="semester" placeholder="Enter Semester">
+            <button onclick="generateTimetable()">View Timetable</button>
+            <div id="timetable"></div>
+            <button onclick="goBack()">Back</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
 
-            switch (choice) {
-                case 1:
-                    l.mainn();
-                    break;
-                case 2:
-                    t.mainn();
-                    break;
-                case 3:
-                	Student.time_table();
-                	System.out.println("Press enter any key to exit");
-                	String garbage=scanner.next();
-                	return;
-                case 4:
-                    System.out.println("==================================================================================================\nThank you for using the Hour wise lecture management System.\n==================================================================================================");
-                    try {
-    					TimeUnit.SECONDS.sleep(3);
-    				} catch (InterruptedException e) {
-    					e.printStackTrace();
-    				}
-                    System.exit(0);
-                    break;
-                default:
-                    System.out.println("------------------------------------\nInvalid choice. Please try again.");
-                    break;
-            }
-       }
-       
-    }
+
+
+//style.cs
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+#menu, #admin-login, #teacher-login, #student-timetable {
+    text-align: center;
+}
+
+button {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.hidden {
+    display: none;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+td {
+    background-color: #f4f4f4;
 }
 
 
-class Student {
-    public static void time_table() {
-        Scanner sem = new Scanner(System.in);
-        String fileName = "Period.txt";
-        System.out.println("Hello Student, Please enter your Semester: ");
-        String semester = sem.next();
+//script.js
 
-        try {
-            List<String> timetable = generateTimetable(fileName, semester);
-            if (timetable.isEmpty()) {
-                System.out.println("No timetable available for Semester " + semester);
-                return;
-            }
+function showAdminLogin() {
+    hideAll();
+    document.getElementById('admin-login').classList.remove('hidden');
+}
 
-            System.out.println("=============================================================================================");
-            System.out.println("|                               Timetable for Semester " + semester + "                                    |");
-            System.out.println("=============================================================================================");
-            System.out.println("---------------------------------------------------------------------------------------------");
-            System.out.printf("| %-20s | %-20s | %-20s | %-20s |\n", "Teacher's Name", "Subject", "Class Timing","Room No.");
-            System.out.println("---------------------------------------------------------------------------------------------");
-            for (String entry : timetable) {
-                System.out.println(entry);
-            }
-            System.out.println("---------------------------------------------------------------------------------------------");
-        } catch (IOException e) {
-            System.err.println("An error occurred while reading the file: " + e.getMessage());
-        }
+function showTeacherLogin() {
+    hideAll();
+    document.getElementById('teacher-login').classList.remove('hidden');
+}
+
+function showStudentTimetable() {
+    hideAll();
+    document.getElementById('student-timetable').classList.remove('hidden');
+}
+
+function generateTimetable() {
+    const semester = document.getElementById('semester').value.trim();
+    const timetableDiv = document.getElementById('timetable');
+
+    // Simulate reading from a file (static data for now)
+    const periodData = [
+        "John Doe,1,Mathematics,09:00 AM - 10:00 AM,Room 101",
+        "Jane Smith,1,Physics,10:00 AM - 11:00 AM,Room 102",
+        "Emily Johnson,2,Chemistry,11:00 AM - 12:00 PM,Room 103"
+    ];
+
+    const timetable = periodData.filter(line => line.includes(`,${semester},`)).map(line => {
+        const [teacherName, , subject, classTiming, roomNumber] = line.split(',');
+        return `<tr>
+                    <td>${teacherName}</td>
+                    <td>${subject}</td>
+                    <td>${classTiming}</td>
+                    <td>${roomNumber}</td>
+                </tr>`;
+    });
+
+    if (timetable.length === 0) {
+        timetableDiv.innerHTML = `<p>No timetable available for Semester ${semester}</p>`;
+    } else {
+        timetableDiv.innerHTML = `
+            <table>
+                <tr>
+                    <th>Teacher's Name</th>
+                    <th>Subject</th>
+                    <th>Class Timing</th>
+                    <th>Room No.</th>
+                </tr>
+                ${timetable.join('')}
+            </table>
+        `;
     }
+}
 
-    private static List<String> generateTimetable(String fileName, String semester) throws IOException {
-        List<String> timetable = new ArrayList<>();
+function hideAll() {
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('admin-login').classList.add('hidden');
+    document.getElementById('teacher-login').classList.add('hidden');
+    document.getElementById('student-timetable').classList.add('hidden');
+}
 
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] details = line.split(",");
-                String currentSemester = details[1].trim();
-                String teacherName = details[0].trim();
-                String subject = details[2].trim();
-                String classTiming = details[3].trim();
-                String roomNumber = details[4].trim();
+function goBack() {
+    hideAll();
+    document.getElementById('menu').classList.remove('hidden');
+}
 
-                if (currentSemester.equals(semester)) {
-                    String entry = String.format("| %-20s | %-20s | %-20s | %-20s |", teacherName, subject, classTiming,roomNumber);
-                    timetable.add(entry);
-                }
-            }
-        }
-
-        return timetable;
-    }
+function exitSystem() {
+    alert("Thank you for using the Hour Wise Lecture Management System.");
+    window.close();
 }
