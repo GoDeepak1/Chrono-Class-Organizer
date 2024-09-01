@@ -1,362 +1,248 @@
-package teacher;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+//index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Teacher Login</h2>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p id="loginMessage"></p>
+    </div>
+
+    <div id="dashboard" class="dashboard-container" style="display: none;">
+        <h2 id="welcomeMessage"></h2>
+        <button onclick="showScheduleForm()">Schedule a Class</button>
+        <button onclick="viewSchedule()">View Schedule</button>
+        <button onclick="logout()">Logout</button>
+
+        <div id="scheduleForm" style="display: none;">
+            <h3>Schedule a Class</h3>
+            <form id="scheduleClassForm">
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject" required>
+                <label for="semester">Semester:</label>
+                <input type="text" id="semester" name="semester" required>
+                <label for="hour">Class Timing:</label>
+                <select id="hour" name="hour"></select>
+                <label for="room">Room:</label>
+                <select id="room" name="room"></select>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <div id="scheduleView" style="display: none;">
+            <h3>Your Schedule</h3>
+            <table id="scheduleTable">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Semester</th>
+                        <th>Class Timing</th>
+                        <th>Room</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Schedule will be dynamically populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
 
 
-public class Teacher_Login {
-    private static final String Teachers_FILE = "teachers.txt";
-    public static void mainn() {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-        	System.out.println("==================================================================================================");
-            System.out.println("Teacher login");
-            System.out.println("==================================================================================================");
-            System.out.print("Enter your username: ");
-            String username = scanner.nextLine();
-            System.out.print("Enter your password: ");
-            String password = scanner.nextLine();
+//style.css
 
-            if (isValidCredentials(username, password)) {
-            	System.out.println("==================================================================================================");
-                System.out.println("Login successful. Welcome, " + username + "!");
-                System.out.println("==================================================================================================");
-                success(username);
-                break;
-            } else {
-            	System.out.println("==================================================================================================");
-                System.out.println("Invalid username or password. Please try again.");
-                System.out.println("==================================================================================================");
-            }
-        }
-
-        System.out.println("==================================================================================================\nThank you for using the Hour wise lecture management System. You have been successfully logged out\n==================================================================================================");
-        try {
-			TimeUnit.SECONDS.sleep(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-    }
-
-    public static void success(String username) {
-    	Scanner scanner = new Scanner(System.in);
-    	while (true) {
-    		System.out.println(".........................................\nPlease choose how do you want to proceed\n.........................................");
-            System.out.println("1. Schedule a class\n-----------------");
-            System.out.println("2. View Schedule\n-----------------");
-            System.out.println("3. Exit\n-----------------");
-            System.out.print("Please choose an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-
-            switch (choice) {
-                case 1:
-                    writer.enter_period(username);
-                    break;
-                case 2:
-                	teacher_tt.time_table(username);
-                	break;
-                case 3:
-                	System.out.println("==================================================================================================\nThank you for using the Hour wise lecture management System. You have been successfully logged out\n==================================================================================================");
-                	try {
-    					TimeUnit.SECONDS.sleep(1);
-    				} catch (InterruptedException e) {
-    					e.printStackTrace();
-    				}
-                	System.exit(0);
-                    break;
-                default:
-                	System.out.println("------------------------------------\nInvalid choice. Please try again.");
-                    break;
-            }
-    }
-    }
-    
-    private static boolean isValidCredentials(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(Teachers_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2 && parts[0].equals(username) && parts[1].equals(password)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while reading the user file.");
-        }
-        return false;
-    }
-    
-    private static boolean userExists(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(Teachers_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2 && parts[0].equals(username)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while reading the user file.");
-        }
-        return false;
-    }
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
 }
 
-class writer {
-    public static void enter_period(String Username) {
-        String fileName = "Period.txt";
-        String name = Username;
-
-        try {
-            List<String> unavailableHours = getUnavailableHours(fileName, name);
-            List<String> availableHours = getAvailableHours(unavailableHours);
-            Set<String> occupiedRooms = getOccupiedRooms(fileName);
-
-            System.out.println("Unavailable hours for " + name + ":");
-            for (String hour : unavailableHours) {
-                System.out.println(hour);
-            }
-
-            if (availableHours.isEmpty()) {
-                System.out.println("Sorry, there are no available slots for you at the moment.");
-                return;
-            }
-
-            System.out.println("Available hours for " + name + ":");
-            for (int i = 0; i < availableHours.size(); i++) {
-                System.out.println((i + 1) + ". " + availableHours.get(i));
-            }
-
-            Scanner scanner = new Scanner(System.in);
-            int chosenHourIndex = -1;
-            while (chosenHourIndex < 0 || chosenHourIndex >= availableHours.size()) {
-                System.out.print("Choose an available hour by entering the list index: ");
-                if (scanner.hasNextInt()) {
-                    chosenHourIndex = scanner.nextInt() - 1;
-                    scanner.nextLine(); // Consume the newline character
-                } else {
-                    System.out.println("Invalid input. Please enter a valid list index.");
-                    scanner.nextLine(); // Consume the invalid input
-                }
-            }
-            String chosenHour = availableHours.get(chosenHourIndex);
-
-            List<String> availableRooms = getAvailableRooms(occupiedRooms, chosenHour);
-
-            if (availableRooms.isEmpty()) {
-                System.out.println("Sorry, there are no available rooms for you at the chosen hour.");
-                return;
-            }
-
-            System.out.println("Available rooms for " + name + " at " + chosenHour + ":");
-            for (int i = 0; i < availableRooms.size(); i++) {
-                System.out.println((i + 1) + ". " + availableRooms.get(i));
-            }
-
-            int chosenRoomIndex = -1;
-            while (chosenRoomIndex < 0 || chosenRoomIndex >= availableRooms.size()) {
-                System.out.print("Choose a room number from the available rooms by entering the list index: ");
-                if (scanner.hasNextInt()) {
-                    chosenRoomIndex = scanner.nextInt() - 1;
-                    scanner.nextLine(); // Consume the newline character
-                } else {
-                    System.out.println("Invalid input. Please enter a valid list index.");
-                    scanner.nextLine(); // Consume the invalid input
-                }
-            }
-            String chosenRoom = availableRooms.get(chosenRoomIndex);
-
-            System.out.print("Enter the subject: ");
-            String subject = scanner.nextLine();
-
-            System.out.print("Enter the semester: ");
-            String semester = scanner.nextLine();
-
-            if (isSemesterHourOccupied(fileName, semester, chosenHour)) {
-                System.out.println("The current semester is already busy at this hour. Please try again with another hour.");
-                List<String> availableHoursForSemester = getAvailableHoursForSemester(fileName, unavailableHours, semester);
-                System.out.println("Available hours for semester " + semester + ":");
-                for (int i = 0; i < availableHoursForSemester.size(); i++) {
-                    System.out.println((i + 1) + ". " + availableHoursForSemester.get(i));
-                }
-                return;
-            }
-
-            String newEntry = name + "," + semester + "," + subject + "," + chosenHour + "," + chosenRoom + "\n";
-            saveEntryToFile(fileName, newEntry);
-            System.out.println("Entry saved successfully!");
-        } catch (IOException e) {
-            System.err.println("An error occurred while reading/writing the file: " + e.getMessage());
-        }
-    }
-
-    private static List<String> getUnavailableHours(String fileName, String name) throws IOException {
-        List<String> unavailableHours = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] details = line.split(",");
-                String currentName = details[0].trim();
-                String classTiming = details[3].trim();
-
-                if (currentName.equals(name)) {
-                    unavailableHours.add(classTiming);
-                }
-            }
-        }
-
-        return unavailableHours;
-    }
-
-    private static List<String> getAvailableHours(List<String> unavailableHours) {
-        List<String> availableHours = new ArrayList<>();
-        Set<String> allHours = generateAllHours();
-
-        for (String hour : allHours) {
-            if (!unavailableHours.contains(hour)) {
-                availableHours.add(hour);
-            }
-        }
-
-        return availableHours;
-    }
-
-    private static Set<String> generateAllHours() {
-        Set<String> allHours = new HashSet<>();
-        int startHour = 9;
-        int endHour = 13;
-
-        for (int hour = startHour; hour <= endHour; hour++) {
-            allHours.add(hour + ":00 - " + (hour + 1) + ":00");
-        }
-
-        return allHours;
-    }
-
-    private static Set<String> getOccupiedRooms(String fileName) throws IOException {
-        Set<String> occupiedRooms = new HashSet<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] details = line.split(",");
-                String classTiming = details[3].trim();
-                String roomNumber = details[4].trim();
-
-                occupiedRooms.add(classTiming + ":" + roomNumber);
-            }
-        }
-
-        return occupiedRooms;
-    }
-
-    private static List<String> getAvailableRooms(Set<String> occupiedRooms, String chosenHour) {
-        List<String> availableRooms = new ArrayList<>();
-        int startRoom = 501;
-        int endRoom = 505;
-
-        for (int room = startRoom; room <= endRoom; room++) {
-            String timingAndRoom = chosenHour + ":" + room;
-            if (!occupiedRooms.contains(timingAndRoom)) {
-                availableRooms.add(Integer.toString(room));
-            }
-        }
-
-        return availableRooms;
-    }
-
-    private static void saveEntryToFile(String fileName, String newEntry) throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName, true))) {
-            bw.write(newEntry);
-        }
-    }
-
-    private static boolean isSemesterHourOccupied(String fileName, String semester, String hour) throws IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] details = line.split(",");
-                String currentSemester = details[1].trim();
-                String classTiming = details[3].trim();
-
-                if (currentSemester.equals(semester) && classTiming.equals(hour)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private static List<String> getAvailableHoursForSemester(String fileName, List<String> unavailableHours, String semester) throws IOException {
-        List<String> availableHours = new ArrayList<>();
-        Set<String> allHours = generateAllHours();
-
-        for (String hour : allHours) {
-            if (!unavailableHours.contains(hour) && !isSemesterHourOccupied(fileName, semester, hour)) {
-                availableHours.add(hour);
-            }
-        }
-
-        return availableHours;
-    }
+.login-container, .dashboard-container {
+    width: 300px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-class teacher_tt {
-    public static void time_table(String username) {
-        String fileName = "Period.txt";
-        try {
-            List<String> timetable = generateTimetable(fileName, username);
-            if (timetable.isEmpty()) {
-                System.out.println("Currently there are no classes alloted to you");
-                return;
-            }
+h2, h3 {
+    text-align: center;
+}
 
-            System.out.println("=============================================================================================");
-            System.out.printf("| %-30s    %-40s     %-10s |\n"," ","Schedule of "+username," ");
-            System.out.println("=============================================================================================");
-            System.out.println("---------------------------------------------------------------------------------------------");
-            System.out.printf("| %-20s | %-20s | %-20s | %-20s |\n", "Teacher's Name", "Subject", "Class Timing","Room No.");
-            System.out.println("---------------------------------------------------------------------------------------------");
-            for (String entry : timetable) {
-                System.out.println(entry);
-            }
-            System.out.println("---------------------------------------------------------------------------------------------");
-        } catch (IOException e) {
-            System.err.println("An error occurred while reading the file: " + e.getMessage());
-        }
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+}
+
+input, select, button {
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#scheduleTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#scheduleTable th, #scheduleTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#scheduleTable th {
+    background-color: #007bff;
+    color: white;
+    text-align: center;
+}
+
+#scheduleTable td {
+    text-align: center;
+}
+
+
+
+//script.js
+
+// Sample data for teacher credentials and schedule
+const teachers = {
+    "teacher1": "password1",
+    "teacher2": "password2"
+};
+
+const schedule = {};
+
+// Handle login
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (teachers[username] && teachers[username] === password) {
+        document.querySelector('.login-container').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('welcomeMessage').innerText = `Welcome, ${username}`;
+        sessionStorage.setItem('username', username);
+    } else {
+        document.getElementById('loginMessage').innerText = 'Invalid username or password.';
+    }
+});
+
+// Show schedule form
+function showScheduleForm() {
+    document.getElementById('scheduleForm').style.display = 'block';
+    document.getElementById('scheduleView').style.display = 'none';
+    populateHoursAndRooms();
+}
+
+// View schedule
+function viewSchedule() {
+    const username = sessionStorage.getItem('username');
+    const userSchedule = schedule[username] || [];
+    const tbody = document.getElementById('scheduleTable').querySelector('tbody');
+    tbody.innerHTML = '';
+
+    if (userSchedule.length === 0) {
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 4;
+        cell.innerText = 'No classes scheduled';
+        row.appendChild(cell);
+        tbody.appendChild(row);
+    } else {
+        userSchedule.forEach((entry) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${entry.subject}</td><td>${entry.semester}</td><td>${entry.hour}</td><td>${entry.room}</td>`;
+            tbody.appendChild(row);
+        });
     }
 
-    private static List<String> generateTimetable(String fileName, String username) throws IOException {
-        List<String> timetable = new ArrayList<>();
+    document.getElementById('scheduleView').style.display = 'block';
+    document.getElementById('scheduleForm').style.display = 'none';
+}
 
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] details = line.split(",");
-                String currentSemester = details[1].trim();
-                String teacherName = details[0].trim();
-                String subject = details[2].trim();
-                String classTiming = details[3].trim();
-                String roomNumber = details[4].trim();
+// Handle class scheduling
+document.getElementById('scheduleClassForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const username = sessionStorage.getItem('username');
+    const subject = document.getElementById('subject').value;
+    const semester = document.getElementById('semester').value;
+    const hour = document.getElementById('hour').value;
+    const room = document.getElementById('room').value;
 
-                if (teacherName.equals(username)) {
-                    String entry = String.format("| %-20s | %-20s | %-20s | %-20s |", teacherName, subject, classTiming,roomNumber);
-                    timetable.add(entry);
-                }
-            }
-        }
-
-        return timetable;
+    if (!schedule[username]) {
+        schedule[username] = [];
     }
+
+    schedule[username].push({ subject, semester, hour, room });
+    alert('Class scheduled successfully!');
+    document.getElementById('scheduleForm').reset();
+});
+
+// Populate available hours and rooms
+function populateHoursAndRooms() {
+    const hours = ["9:00 - 10:00", "10:00 - 11:00", "11:00 - 12:00", "12:00 - 1:00"];
+    const rooms = ["501", "502", "503", "504", "505"];
+
+    const hourSelect = document.getElementById('hour');
+    const roomSelect = document.getElementById('room');
+
+    hourSelect.innerHTML = '';
+    roomSelect.innerHTML = '';
+
+    hours.forEach(hour => {
+        const option = document.createElement('option');
+        option.value = hour;
+        option.innerText = hour;
+        hourSelect.appendChild(option);
+    });
+
+    rooms.forEach(room => {
+        const option = document.createElement('option');
+        option.value = room;
+        option.innerText = room;
+        roomSelect.appendChild(option);
+    });
+}
+
+// Handle logout
+function logout() {
+    sessionStorage.clear();
+    document.querySelector('.login-container').style.display = 'block';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('loginMessage').innerText = '';
 }
