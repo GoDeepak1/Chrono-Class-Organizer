@@ -1,150 +1,177 @@
-package admin;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+//index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Hour Wise Lecture Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Admin Login</h1>
+        <div id="login-section">
+            <input type="text" id="username" placeholder="Enter your username" required>
+            <input type="password" id="password" placeholder="Enter your password" required>
+            <button onclick="login()">Login</button>
+            <p id="login-error" class="error"></p>
+        </div>
+
+        <div id="admin-section" class="hidden">
+            <h2>Welcome, Admin!</h2>
+            <button onclick="showRegisterTeacher()">Register a Teacher</button>
+            <button onclick="showTeacherList()">List of Teachers</button>
+            <button onclick="logout()">Logout</button>
+        </div>
+
+        <div id="register-teacher-section" class="hidden">
+            <h2>Register a Teacher</h2>
+            <input type="text" id="new-username" placeholder="Enter teacher's name" required>
+            <input type="password" id="new-password" placeholder="Enter a password" required>
+            <button onclick="registerTeacher()">Register</button>
+            <p id="register-error" class="error"></p>
+            <button onclick="goBack()">Back</button>
+        </div>
+
+        <div id="teacher-list-section" class="hidden">
+            <h2>Registered Teachers</h2>
+            <ul id="teacher-list"></ul>
+            <button onclick="goBack()">Back</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
 
 
-public class LoginSystem {
-	private static final String USERS_FILE = "users.txt";
-    private static final String Teachers_FILE = "teachers.txt";
+//style.css
 
-    public static void mainn() {
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-        	System.out.println("==================================================================================================");
-            System.out.println("Admin login");
-            System.out.println("==================================================================================================");
-            System.out.print("Enter your username: ");
-            String username = scanner.nextLine();
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
 
-            System.out.print("Enter your password: ");
-            String password = scanner.nextLine();
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
 
-            if (isValidCredentials(username, password)) {
-            	System.out.println("==================================================================================================");
-                System.out.println("Login successful. Welcome, " + username + "!");
-                System.out.println("==================================================================================================");
-                success();
-                break;
-            } else {
-            	System.out.println("==================================================================================================");
-                System.out.println("Invalid username or password. Please try again.");
-                System.out.println("==================================================================================================");
-            }
-        }
+h1, h2 {
+    text-align: center;
+    color: #333;
+}
 
-        System.out.println("==================================================================================================\nThank you for using the Hour wise lecture management System. You have been successfully logged out\n==================================================================================================");
-        try {
-			TimeUnit.SECONDS.sleep(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+input {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+button {
+    display: block;
+    width: calc(100% - 20px);
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.hidden {
+    display: none;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+
+
+//script.js
+
+// Simulated database of users and teachers
+let users = {
+    admin: 'password123'
+};
+
+let teachers = [];
+
+function login() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+
+    if (users[username] && users[username] === password) {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('admin-section').classList.remove('hidden');
+        document.getElementById('login-error').textContent = '';
+    } else {
+        document.getElementById('login-error').textContent = 'Invalid username or password.';
+    }
+}
+
+function showRegisterTeacher() {
+    document.getElementById('admin-section').classList.add('hidden');
+    document.getElementById('register-teacher-section').classList.remove('hidden');
+}
+
+function registerTeacher() {
+    const username = document.getElementById('new-username').value.trim();
+    const password = document.getElementById('new-password').value.trim();
+
+    if (username === '' || password === '') {
+        document.getElementById('register-error').textContent = 'Please fill in all fields.';
+        return;
     }
 
-    public static void success() {
-    	Scanner scanner = new Scanner(System.in);
-    	while (true) {
-    		System.out.println(".........................................\nPlease choose how do you want to proceed\n.........................................");
-            System.out.println("1. Register a teacher\n-----------------");
-            System.out.println("2. List of teachers\n-----------------");
-            System.out.println("3. Exit\n-----------------");
-            System.out.print("Please choose an option: ");
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+    if (teachers.find(teacher => teacher.username === username)) {
+        document.getElementById('register-error').textContent = 'Username already exists. Please choose a different username.';
+        return;
+    }
 
-            switch (choice) {
-                case 1:
-                    registerUser(scanner);
-                    break;
-                case 2:
-                	readAndPrintNames();
-                    break;
-                case 3:
-                	System.out.println("==================================================================================================\nThank you for using the Hour wise lecture management System. You have been successfully logged out\n==================================================================================================");
-                	try {
-    					TimeUnit.SECONDS.sleep(1);
-    				} catch (InterruptedException e) {
-    					e.printStackTrace();
-    				}
-                	System.exit(0);
-                    break;
-                default:
-                	System.out.println("------------------------------------\nInvalid choice. Please try again.");
-                    break;
-            }
-    }
-    }
-    
-    private static boolean isValidCredentials(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(USERS_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2 && parts[0].equals(username) && parts[1].equals(password)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while reading the user file.");
-        }
-        return false;
-    }
-    
-    private static void registerUser(Scanner scanner) {
-        System.out.println("==== Teacher Registration ====");
-        System.out.print("Enter name of teacher: ");
-        String username = scanner.nextLine();
+    teachers.push({ username, password });
+    document.getElementById('register-error').textContent = '';
+    alert('Teacher registered successfully!');
+    goBack();
+}
 
-        if (userExists(username)) {
-            System.out.println("Username already exists. Please choose a different username.");
-            return;
-        }
+function showTeacherList() {
+    document.getElementById('admin-section').classList.add('hidden');
+    document.getElementById('teacher-list-section').classList.remove('hidden');
 
-        System.out.print("Enter a password: ");
-        String password = scanner.nextLine();
+    const teacherList = document.getElementById('teacher-list');
+    teacherList.innerHTML = '';
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Teachers_FILE, true))) {
-            writer.write(username + "," + password);
-            writer.newLine();
-            System.out.println("Registration successful.");
-        } catch (IOException e) {
-            System.out.println("An error occurred while registering the user.");
-        }
-    }
-    private static boolean userExists(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(Teachers_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length == 2 && parts[0].equals(username)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("An error occurred while reading the user file.");
-        }
-        return false;
-    }
-    
-    public static void readAndPrintNames(){
-    	int g=0;
-    	try (BufferedReader reader = new BufferedReader(new FileReader(Teachers_FILE))){
-        String line;
-        System.out.println("=================================\nThe teachers registered are\n=================================");
-        while ((line = reader.readLine()) != null) {
-            String[] entry = line.split(",");
-            if (entry.length >= 1) {
-                String name = entry[0];
-                g++;
-                System.out.println(g+". "+name+"\n--------------------");
-            }
-        }
-    } catch (IOException e) {
-        System.out.println("An error occurred while reading the user file.");
-    }
-    }
+    teachers.forEach((teacher, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${teacher.username}`;
+        teacherList.appendChild(li);
+    });
+}
+
+function goBack() {
+    document.getElementById('register-teacher-section').classList.add('hidden');
+    document.getElementById('teacher-list-section').classList.add('hidden');
+    document.getElementById('admin-section').classList.remove('hidden');
+}
+
+function logout() {
+    document.getElementById('admin-section').classList.add('hidden');
+    document.getElementById('login-section').classList.remove('hidden');
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
 }
