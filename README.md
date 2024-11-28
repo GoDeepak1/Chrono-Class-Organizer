@@ -34,11 +34,7 @@ Database
 SQL: For storing and managing scheduling data.
 Installation
 Follow these steps to set up the project locally:
-
-Clone the Repository
-
-Copy code
-git clone https://github.com/GoDeepak1/Hour-wise-Lecture-Management-System.git  
+ 
 cd Hour-wise-Lecture-Management-System  
 Install Dependencies
 Ensure Node.js is installed, then run:
