@@ -1,4 +1,4 @@
-# Hour-wise-Lecture-Management-System
+#  Chrono Class Organizer
 
 The Hour-wise Lecture Management System is a streamlined solution for managing lecture schedules across academic institutions. It allows administrators to efficiently plan and assign lectures, ensuring smooth daily operations for teachers and students.
 
